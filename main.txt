@@ -1,0 +1,56 @@
+from nicegui import ui
+import database
+
+# Initialisation de la base de données au lancement
+database.init_db()
+
+@ui.page('/')
+def main_page():
+    ui.label('Étiqueteuse Pro - Gestion & Impression').classes('text-2xl font-bold mb-4')
+    
+    with ui.row().classes('w-full items-center gap-4 mb-6'):
+        # Upload de fichier Excel
+        async def handle_upload(e):
+            # Sauvegarde temporaire du fichier uploadé
+            file_path = f"data/{e.name}"
+            with open(file_path, "wb") as f:
+                f.write(e.content.read())
+            
+            success, message = database.import_excel_to_db(file_path)
+            if success:
+                ui.notify(message, type='positive')
+                refresh_table()
+            else:
+                ui.notify(message, type='negative')
+
+        ui.upload(on_upload=handle_upload, label='Importer un fichier Excel (Base Articles)').classes('max-w-md')
+
+    ui.label('Base articles actuelle :').classes('text-lg font-semibold mt-4')
+    
+    # Tableau interactif des articles
+    table_container = ui.row().classes('w-full')
+    
+    def refresh_table():
+        table_container.clear()
+        df = database.get_all_articles()
+        if not df.empty:
+            with table_container:
+                ui.ag_grid({
+                    'columnDefs': [
+                        {'headerName': 'Référence', 'field': 'reference', 'checkboxSelection': True, 'headerCheckboxSelection': True},
+                        {'headerName': 'Désignation', 'field': 'designation', 'flex': 2},
+                        {'headerName': 'Prix (€)', 'field': 'prix'},
+                        {'headerName': 'Code-barres', 'field': 'code_barre'},
+                        {'headerName': 'Famille', 'field': 'famille'},
+                        {'headerName': 'Stock', 'field': 'stock'},
+                    ],
+                    'rowData': df.to_dict('records'),
+                    'rowSelection': 'multiple',
+                }).classes('w-full h-96')
+        else:
+            with table_container:
+                ui.label('Aucun article en base. Importe un fichier Excel pour commencer.').classes('italic text-gray-500')
+
+    refresh_table()
+
+ui.run(port=8080, title="Logiciel Étiquettes", reload=True)
