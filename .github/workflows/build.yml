@@ -3,7 +3,11 @@ name: Build Desktop App
 on:
   push:
     tags:
-      - 'v*' # Se déclenche dès que tu pousses un tag (ex: v1.0.0)
+      - 'v*'
+
+# 👈 C'est ici qu'on donne l'autorisation d'écriture au workflow
+permissions:
+  contents: write
 
 jobs:
   build-windows:
