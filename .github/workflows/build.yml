@@ -29,17 +29,17 @@ jobs:
         if (Test-Path requirements.txt) { pip install -r requirements.txt }
         pip install pyinstaller pywebview
 
+    - name: 🏷️ Générer le fichier de version depuis le tag Git
+      run: |
+        echo "VERSION = '${{ github.ref_name }}'" > version.py
+
     - name: 🔨 Compilation avec PyInstaller
       run: |
         pyinstaller --name "TechFiveLabels" --noconsole --icon="data/favicon.ico" --add-data "data;data" main.py
-
-    - name: 📦 Compression du dossier de build
-      run: |
-        Compress-Archive -Path "dist/TechFiveLabels" -DestinationPath "TechFiveLabels-Windows.zip"
-
-    - name: 🚀 Publication de la Release sur GitHub
+        
+    - name: 🚀 Publication de l'executable sur GitHub Releases
       uses: softprops/action-gh-release@v1
       with:
-        files: TechFiveLabels-Windows.zip
+        files: dist/TechFiveLabels/TechFiveLabels.exe # 👈 On cible directement l'exe final
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
