@@ -1,33 +1,32 @@
-name: Build Desktop App
+name: Build and Release
 
 on:
   push:
     tags:
       - 'v*'
 
-# 👈 C'est ici qu'on donne l'autorisation d'écriture au workflow
 permissions:
   contents: write
 
 jobs:
-  build-windows:
+  build:
     runs-on: windows-latest
 
     steps:
-    - name: 📥 Récupération du code
+    - name: 🔄 Cloner le dépôt
       uses: actions/checkout@v4
 
-    - name: 🐍 Installation de Python
+    - name: 🐍 Configurer Python
       uses: actions/setup-python@v5
       with:
         python-version: '3.11'
         cache: 'pip'
 
-    - name: 📦 Installation des dépendances
+    - name: 📦 Installer les dépendances
       run: |
         python -m pip install --upgrade pip
-        if (Test-Path requirements.txt) { pip install -r requirements.txt }
-        pip install pyinstaller pywebview
+        pip install -r requirements.txt
+        pip install pyinstaller
 
     - name: 🏷️ Générer le fichier de version depuis le tag Git
       run: |
@@ -35,11 +34,24 @@ jobs:
 
     - name: 🔨 Compilation avec PyInstaller
       run: |
-        pyinstaller --name "TechFiveLabels" --noconsole --icon="data/favicon.ico" --add-data "data;data" main.py
-        
-    - name: 🚀 Publication de l'executable sur GitHub Releases
+        python -m PyInstaller --name "TechFiveLabels" --noconsole --icon="data/favicon.ico" --add-data "data;data" main.py
+
+    - name: 📥 Installer Inno Setup
+      run: |
+        winget install JRSoftware.InnoSetup
+
+    - name: 📦 Création de l'installeur avec Inno Setup
+      run: |
+        # Utilise le chemin par défaut d'Inno Setup installé via winget
+        & "${{ 3 }}innoextract\iscc.exe" installer.iss
+      shell: pwsh
+
+    - name: 🚀 Publier la Release sur GitHub
       uses: softprops/action-gh-release@v1
       with:
-        files: dist/TechFiveLabels/TechFiveLabels.exe # 👈 On cible directement l'exe final
+        files: |
+          installer_output/TechFiveLabels_Setup.exe
+        draft: false
+        prerelease: false
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
