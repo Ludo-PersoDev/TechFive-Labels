@@ -38,14 +38,15 @@ jobs:
 
     - name: 📥 Installer Inno Setup
       run: |
-        winget install JRSoftware.InnoSetup
+        winget install JRSoftware.InnoSetup --accept-package-agreements --accept-source-agreements
 
     - name: 📦 Création de l'installeur avec Inno Setup
       run: |
-        # Utilise le chemin par défaut d'Inno Setup installé via winget
-        & "${{ 3 }}innoextract\iscc.exe" installer.iss
+        # Chemin standard d'Inno Setup installé via winget
+        $iscc = "C:\Program Files (x86)\Inno Setup 6\iscc.exe"
+        & $iscc installer.iss
       shell: pwsh
-
+      
     - name: 🚀 Publier la Release sur GitHub
       uses: softprops/action-gh-release@v1
       with:
