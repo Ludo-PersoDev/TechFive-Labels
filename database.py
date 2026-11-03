@@ -3,19 +3,20 @@ import pandas as pd
 import os
 import sys
 
-# --- GESTION DU CHEMIN ABSOLU POUR LA BDD ---
+# --- GESTION DU CHEMIN BDD (DANS APPDATA POUR ÉVITER LES PERMISSIONS) ---
 if getattr(sys, 'frozen', False):
-    # Si l'application est compilée en .exe, on se place là où réside l'exécutable (ex: C:\Tech5Labels)
-    base_dir = os.path.dirname(sys.executable)
+    # En mode exécutable (Program Files), on stocke la BDD dans AppData\Roaming\TechFiveLabels\data
+    appdata_dir = os.getenv('APPDATA') or os.path.expanduser('~')
+    base_dir = os.path.join(appdata_dir, "TechFiveLabels")
 else:
-    # En mode développement (python main.py), on utilise le dossier du projet
+    # En mode développement (python main.py), on utilise le dossier local du projet
     base_dir = os.path.dirname(os.path.abspath(__file__))
 
 DB_DIR = os.path.join(base_dir, "data")
-os.makedirs(DB_DIR, exist_ok=True)  # S'assure que le dossier data existe toujours
+os.makedirs(DB_DIR, exist_ok=True)  # S'assure que le dossier data existe dans AppData
 
 DB_PATH = os.path.join(DB_DIR, "etiquettes.db")
-# ---------------------------------------------
+# ---------------------------------------------------------------------
 
 def init_db():
     os.makedirs("data", exist_ok=True)
