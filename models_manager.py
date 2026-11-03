@@ -1,5 +1,6 @@
 import sqlite3
 import json
+import database
 
 DEFAULT_TEMPLATES = [
     # --- FORMATS AGIPA ---
@@ -149,7 +150,7 @@ def get_default_template_config():
     return {"format_type": "a4_grid", "width_mm": 70.0, "height_mm": 37.0, "config": {"cols": 3, "rows": 8, "elements": {}}}
 
 def init_default_templates():
-    conn = sqlite3.connect("data/etiquettes.db")
+    conn = sqlite3.connect(database.DB_PATH)
     cursor = conn.cursor()
     
     cursor.execute("""
@@ -179,7 +180,7 @@ def init_default_templates():
     conn.close()
 
 def save_template(name, format_type, width_mm, height_mm, config):
-    conn = sqlite3.connect("data/etiquettes.db")
+    conn = sqlite3.connect(database.DB_PATH)
     cursor = conn.cursor()
     
     cursor.execute("""
@@ -196,7 +197,7 @@ def save_template(name, format_type, width_mm, height_mm, config):
     conn.close()
 
 def list_templates_full():
-    conn = sqlite3.connect("data/etiquettes.db")
+    conn = sqlite3.connect(database.DB_PATH)
     cursor = conn.cursor()
     
     cursor.execute("""
@@ -231,7 +232,7 @@ def list_templates():
     return list_templates_full()
     
 def get_template(name):
-    conn = sqlite3.connect("data/etiquettes.db")
+    conn = sqlite3.connect(database.DB_PATH)
     cursor = conn.cursor()
     
     cursor.execute("SELECT id, name, format_type, width_mm, height_mm, config FROM templates WHERE name = ?", (name,))
