@@ -1,17 +1,18 @@
 import sys
 import os
 
-# --- SÉCURISATION DU DOSSIER DATA AU DÉMARRAGE ---
+# --- SÉCURISATION DU DOSSIER DATA (DANS APPDATA POUR ÉVITER LES PERMISSIONS) ---
 if getattr(sys, 'frozen', False):
-    # En mode exécutable (dans Program Files ou AppData, selon ton choix actuel)
-    base_dir = os.path.dirname(sys.executable)
+    # En mode exécutable (Program Files), on stocke les données dans AppData\Roaming\TechFiveLabels\data
+    appdata_dir = os.getenv('APPDATA') or os.path.expanduser('~')
+    base_dir = os.path.join(appdata_dir, "TechFiveLabels")
 else:
-    # En mode développement
+    # En mode développement (python main.py), on utilise le dossier local du projet
     base_dir = os.path.dirname(os.path.abspath(__file__))
 
 DATA_DIR = os.path.join(base_dir, "data")
 os.makedirs(DATA_DIR, exist_ok=True)
-# ------------------------------------------------
+# ---------------------------------------------------------------------------
 
 import subprocess
 import tempfile
