@@ -1,9 +1,22 @@
 import sys
+import os
+
+# --- SÉCURISATION DU DOSSIER DATA AU DÉMARRAGE ---
+if getattr(sys, 'frozen', False):
+    # En mode exécutable (dans Program Files ou AppData, selon ton choix actuel)
+    base_dir = os.path.dirname(sys.executable)
+else:
+    # En mode développement
+    base_dir = os.path.dirname(os.path.abspath(__file__))
+
+DATA_DIR = os.path.join(base_dir, "data")
+os.makedirs(DATA_DIR, exist_ok=True)
+# ------------------------------------------------
+
 import subprocess
 import tempfile
 import requests
-import os
-import asyncio  # 👈 Indispensable pour les pauses asynchrones
+import asyncio
 import webview
 from nicegui import ui, app
 
@@ -26,7 +39,7 @@ GITHUB_REPO = "Ludo-PersoDev/TechFive-Labels"
 models_manager.init_default_templates()
 
 # Exposition du dossier data pour les assets (icônes, logos, etc.)
-app.add_static_files('/data', 'data')
+app.add_static_files('/data', DATA_DIR)
 database.init_db()
 
 # AUTO-IMPORT AU DÉMARRAGE (si présent)
