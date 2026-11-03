@@ -1,0 +1,5 @@
+Ajouter le choix des polices dans l'éditeur d'étiquettes
+Ajouter la couleur des polices dans l'éditeur d'étiquettes
+
+IMPORTANT
+Mettre un refresh des modèle dans le selecteur pour impression
