@@ -6,18 +6,18 @@ from tkinter import filedialog
 
 def create_templates_tab():
     current_elements_state = {
-        "designation": {"enabled": True, "x_mm": 2.0, "y_mm": 2.0, "width_mm": 30.0, "height_mm": 8.0, "font_size": 11, "bold": True, "italic": False, "align_h": "left", "align_v": "top"},
-        "price": {"enabled": True, "x_mm": 35.0, "y_mm": 2.0, "width_mm": 18.0, "height_mm": 8.0, "font_size": 11, "bold": True, "italic": False, "align_h": "right", "align_v": "top"},
-        "family": {"enabled": False, "x_mm": 2.0, "y_mm": 2.0, "width_mm": 25.0, "height_mm": 6.0, "font_size": 9, "bold": False, "italic": False, "align_h": "left", "align_v": "top"},
-        "sub_family": {"enabled": False, "x_mm": 2.0, "y_mm": 2.0, "width_mm": 25.0, "height_mm": 6.0, "font_size": 9, "bold": False, "italic": False, "align_h": "left", "align_v": "top"},
-        "origin": {"enabled": False, "x_mm": 2.0, "y_mm": 2.0, "width_mm": 25.0, "height_mm": 6.0, "font_size": 9, "bold": False, "italic": False, "align_h": "left", "align_v": "top"},
-        "net_quantity": {"enabled": False, "x_mm": 2.0, "y_mm": 2.0, "width_mm": 25.0, "height_mm": 6.0, "font_size": 9, "bold": False, "italic": False, "align_h": "right", "align_v": "top"},
-        "unit_measure": {"enabled": False, "x_mm": 2.0, "y_mm": 2.0, "width_mm": 15.0, "height_mm": 6.0, "font_size": 9, "bold": False, "italic": False, "align_h": "left", "align_v": "top"},
-        "category": {"enabled": False, "x_mm": 2.0, "y_mm": 2.0, "width_mm": 25.0, "height_mm": 6.0, "font_size": 9, "bold": False, "italic": False, "align_h": "left", "align_v": "top"},
-        "caliber": {"enabled": False, "x_mm": 2.0, "y_mm": 2.0, "width_mm": 25.0, "height_mm": 6.0, "font_size": 9, "bold": False, "italic": False, "align_h": "left", "align_v": "top"},
-        "variety": {"enabled": False, "x_mm": 2.0, "y_mm": 2.0, "width_mm": 25.0, "height_mm": 6.0, "font_size": 9, "bold": False, "italic": False, "align_h": "left", "align_v": "top"},
-        "allergens": {"enabled": False, "x_mm": 2.0, "y_mm": 2.0, "width_mm": 25.0, "height_mm": 6.0, "font_size": 8, "bold": False, "italic": True, "align_h": "left", "align_v": "top"},
-        "dlc_days": {"enabled": False, "x_mm": 2.0, "y_mm": 2.0, "width_mm": 25.0, "height_mm": 6.0, "font_size": 9, "bold": True, "italic": False, "align_h": "left", "align_v": "top"},
+        "designation": {"enabled": True, "x_mm": 2.0, "y_mm": 2.0, "width_mm": 30.0, "height_mm": 8.0, "font_size": 11, "bold": True, "italic": False, "font_family": "Arial", "font_color": "#000000", "align_h": "left", "align_v": "top"},
+        "price": {"enabled": True, "x_mm": 35.0, "y_mm": 2.0, "width_mm": 18.0, "height_mm": 8.0, "font_size": 11, "bold": True, "italic": False, "font_family": "Arial", "font_color": "#000000", "align_h": "right", "align_v": "top"},
+        "family": {"enabled": False, "x_mm": 2.0, "y_mm": 2.0, "width_mm": 25.0, "height_mm": 6.0, "font_size": 9, "bold": False, "italic": False, "font_family": "Arial", "font_color": "#000000", "align_h": "left", "align_v": "top"},
+        "sub_family": {"enabled": False, "x_mm": 2.0, "y_mm": 2.0, "width_mm": 25.0, "height_mm": 6.0, "font_size": 9, "bold": False, "italic": False, "font_family": "Arial", "font_color": "#000000", "align_h": "left", "align_v": "top"},
+        "origin": {"enabled": False, "x_mm": 2.0, "y_mm": 2.0, "width_mm": 25.0, "height_mm": 6.0, "font_size": 9, "bold": False, "italic": False, "font_family": "Arial", "font_color": "#000000", "align_h": "left", "align_v": "top"},
+        "net_quantity": {"enabled": False, "x_mm": 2.0, "y_mm": 2.0, "width_mm": 25.0, "height_mm": 6.0, "font_size": 9, "bold": False, "italic": False, "font_family": "Arial", "font_color": "#000000", "align_h": "right", "align_v": "top"},
+        "unit_measure": {"enabled": False, "x_mm": 2.0, "y_mm": 2.0, "width_mm": 15.0, "height_mm": 6.0, "font_size": 9, "bold": False, "italic": False, "font_family": "Arial", "font_color": "#000000", "align_h": "left", "align_v": "top"},
+        "category": {"enabled": False, "x_mm": 2.0, "y_mm": 2.0, "width_mm": 25.0, "height_mm": 6.0, "font_size": 9, "bold": False, "italic": False, "font_family": "Arial", "font_color": "#000000", "align_h": "left", "align_v": "top"},
+        "caliber": {"enabled": False, "x_mm": 2.0, "y_mm": 2.0, "width_mm": 25.0, "height_mm": 6.0, "font_size": 9, "bold": False, "italic": False, "font_family": "Arial", "font_color": "#000000", "align_h": "left", "align_v": "top"},
+        "variety": {"enabled": False, "x_mm": 2.0, "y_mm": 2.0, "width_mm": 25.0, "height_mm": 6.0, "font_size": 9, "bold": False, "italic": False, "font_family": "Arial", "font_color": "#000000", "align_h": "left", "align_v": "top"},
+        "allergens": {"enabled": False, "x_mm": 2.0, "y_mm": 2.0, "width_mm": 25.0, "height_mm": 6.0, "font_size": 8, "bold": False, "italic": True, "font_family": "Arial", "font_color": "#000000", "align_h": "left", "align_v": "top"},
+        "dlc_days": {"enabled": False, "x_mm": 2.0, "y_mm": 2.0, "width_mm": 25.0, "height_mm": 6.0, "font_size": 9, "bold": True, "italic": False, "font_family": "Arial", "font_color": "#000000", "align_h": "left", "align_v": "top"},
         "barcode": {"enabled": False, "x_mm": 2.0, "y_mm": 2.0, "width_mm": 30.0, "height_mm": 8.0},
         "logo": {"enabled": False, "x_mm": 2.0, "y_mm": 2.0, "width_mm": 20.0, "height_mm": 10.0}
     }
@@ -126,6 +126,8 @@ def create_templates_tab():
                                 current_elements_state[f_key]["font_size"] = int(ui_widgets['size'].value or 10)
                                 current_elements_state[f_key]["bold"] = bool(ui_widgets['bold'].value)
                                 current_elements_state[f_key]["italic"] = bool(ui_widgets['italic'].value)
+                                current_elements_state[f_key]["font_family"] = str(ui_widgets['font_family'].value or "Arial")
+                                current_elements_state[f_key]["font_color"] = str(ui_widgets['font_color'].value or "#000000")
                                 current_elements_state[f_key]["align_h"] = str(ui_widgets['align_h'].value or "left")
                                 current_elements_state[f_key]["align_v"] = str(ui_widgets['align_v'].value or "top")
 
@@ -174,6 +176,8 @@ def create_templates_tab():
                                 px_size = max(8, int(f_size * 0.9))
                                 bold_style = "font-weight: bold;" if cfg.get("bold", False) else ""
                                 italic_style = "font-style: italic;" if cfg.get("italic", False) else ""
+                                font_family = cfg.get("font_family", "Arial")
+                                font_color = cfg.get("font_color", "#000000")
                                 
                                 align_h = cfg.get("align_h", "left")
                                 flex_justify = "justify-start" if align_h == "left" else ("justify-center" if align_h == "center" else "justify-end")
@@ -202,7 +206,7 @@ def create_templates_tab():
                                 )
                                 box.props(f'data-field="{key}"')
                                 with box:
-                                    ui.label(label_text).classes(f'truncate pointer-events-none text-{align_h}').style(f'font-size: {px_size}px; {bold_style} {italic_style}')
+                                    ui.label(label_text).classes(f'truncate pointer-events-none text-{align_h}').style(f'font-size: {px_size}px; {bold_style} {italic_style} font-family: {font_family}; color: {font_color};')
 
                     ui.run_javascript("""
                         setTimeout(() => {
@@ -311,11 +315,21 @@ def create_templates_tab():
                                             cb_it = ui.checkbox('Italique', value=cfg.get("italic", False))
                                         
                                         with ui.row().classes('w-full gap-2 items-center'):
+                                            sel_font = ui.select(
+                                                {'Arial': 'Arial', 'Helvetica': 'Helvetica', 'Times New Roman': 'Times New Roman', 'Courier New': 'Courier New', 'Georgia': 'Georgia'},
+                                                label='Police',
+                                                value=cfg.get("font_family", "Arial")
+                                            ).classes('w-36')
+                                            color_input = ui.input('Couleur', value=cfg.get("font_color", "#000000")).props('type="color"').classes('w-28')
+
+                                        with ui.row().classes('w-full gap-2 items-center'):
                                             sel_h = ui.select({'left': 'Gauche', 'center': 'Centré', 'right': 'Droite'}, label='Align. H', value=cfg.get("align_h", "left")).classes('w-36')
                                             sel_v = ui.select({'top': 'Haut', 'center': 'Centré', 'bottom': 'Bas'}, label='Align. V', value=cfg.get("align_v", "top")).classes('w-36')
 
                                         fields_ui_controls[f_key] = {
-                                            'enabled': cb, 'size': num_size, 'bold': cb_bold, 'italic': cb_it, 'align_h': sel_h, 'align_v': sel_v
+                                            'enabled': cb, 'size': num_size, 'bold': cb_bold, 'italic': cb_it, 
+                                            'font_family': sel_font, 'font_color': color_input,
+                                            'align_h': sel_h, 'align_v': sel_v
                                         }
 
             render_template_fields_controls()
