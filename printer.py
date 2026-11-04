@@ -3,18 +3,27 @@ from reportlab.lib.pagesizes import A4
 from reportlab.pdfgen import canvas
 from reportlab.lib.units import mm
 from reportlab.platypus import Paragraph
-from reportlab.lib.styles import ParagraphStyle, getSampleStyleSheet
+from reportlab.lib.styles import ParagraphStyle
 from reportlab.lib.enums import TA_LEFT, TA_CENTER, TA_RIGHT
+from reportlab.lib import colors
 import barcode
 from barcode.writer import ImageWriter
 import tempfile
-from PIL import Image, ImageDraw, ImageFont
 from datetime import datetime, timedelta
 import database
+import sys
+
+# --- UTILITAIRE DE CHEMIN SÉCURISÉ (IDENTIQUE À MAIN.PY) ---
+def get_data_dir():
+    if getattr(sys, 'frozen', False):
+        appdata_dir = os.getenv('APPDATA') or os.path.expanduser('~')
+        return os.path.join(appdata_dir, "TechFiveLabels", "data")
+    return os.path.join(os.path.dirname(os.path.abspath(__file__)), "data")
 
 def generate_labels_pdf(selected_articles, template_config, output_filename="etiquettes.pdf"):
-    os.makedirs("data", exist_ok=True)
-    output_path = os.path.join("data", output_filename)
+    data_dir = get_data_dir()
+    os.makedirs(data_dir, exist_ok=True)
+    output_path = os.path.join(data_dir, output_filename)
     
     format_type = template_config.get("format_type", "a4_grid")
     width_mm = template_config.get("width_mm", 70.0)
@@ -99,9 +108,9 @@ def _draw_element_content(c, cell_x, cell_y, cell_width, cell_height, elements_c
         elif key == "price":
             prix_val = article.get('price', 0.0)
             if isinstance(prix_val, (int, float)):
-                text = f"Prix : {prix_val:.2f} €"
+                text = f"{prix_val:.2f} €"
             else:
-                text = f"Prix : {prix_val} €"
+                text = f"{prix_val} €"
         elif key == "family":
             text = str(article.get('family', ''))
         elif key == "sub_family":
@@ -181,23 +190,49 @@ def _draw_text_box(c, cell_x, cell_y, cell_width, cell_height, cfg, text):
     italic = cfg.get("italic", False)
     align_h = cfg.get("align_h", "left")
     
+    # Récupération de la police et de la couleur personnalisées
+    font_family_raw = cfg.get("font_family", "Arial")
+    font_color_hex = cfg.get("font_color", "#000000")
+    
+    # Mapping vers les polices standard supportées par ReportLab
+    font_map = {
+        "Arial": "Helvetica",
+        "Helvetica": "Helvetica",
+        "Times New Roman": "Times-Roman",
+        "Courier New": "Courier",
+        "Georgia": "Times-Roman"
+    }
+    base_font = font_map.get(font_family_raw, "Helvetica")
+    
+    font_name = base_font
+    if base_font == "Helvetica":
+        if bold and italic: font_name = "Helvetica-BoldOblique"
+        elif bold: font_name = "Helvetica-Bold"
+        elif italic: font_name = "Helvetica-Oblique"
+    elif base_font == "Times-Roman":
+        if bold and italic: font_name = "Times-BoldItalic"
+        elif bold: font_name = "Times-Bold"
+        elif italic: font_name = "Times-Italic"
+    elif base_font == "Courier":
+        if bold and italic: font_name = "Courier-BoldOblique"
+        elif bold: font_name = "Courier-Bold"
+        elif italic: font_name = "Courier-Oblique"
+
     ta_map = {"left": TA_LEFT, "center": TA_CENTER, "right": TA_RIGHT}
     alignment = ta_map.get(align_h, TA_LEFT)
     
-    font_name = "Helvetica"
-    if bold and italic:
-        font_name = "Helvetica-BoldOblique"
-    elif bold:
-        font_name = "Helvetica-Bold"
-    elif italic:
-        font_name = "Helvetica-Oblique"
-        
+    try:
+        text_color = colors.HexColor(font_color_hex)
+    except Exception:
+        text_color = colors.black
+
     style = ParagraphStyle(
         'DynamicStyle',
         fontName=font_name,
         fontSize=font_size,
         leading=font_size * 1.2,
-        alignment=alignment
+        alignment=alignment,
+        textColor=text_color
     )
     
     bx = cell_x + x_mm * mm

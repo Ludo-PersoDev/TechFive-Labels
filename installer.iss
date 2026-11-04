@@ -1,6 +1,6 @@
 [Setup]
 AppName=TechFive Labels
-AppVersion=1.0.9
+AppVersion=1.6.0
 DefaultDirName={autopf}\TechFiveLabels
 DefaultGroupName=TechFive Labels
 OutputDir=installer_output
