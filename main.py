@@ -61,44 +61,41 @@ elif os.path.exists(f"data/{default_csv}"):
     success, msg = database.import_excel_to_db(f"data/{default_csv}")
     print(f"AUTO-IMPORT STATUT : {msg}")
 
-def perform_auto_update(download_url):
+def perform_auto_update(download_url, progress_bar, status_label):
     try:
-        # 1. Télécharger le nouvel exe dans le dossier temporaire de Windows
         temp_dir = tempfile.gettempdir()
-        new_exe_path = os.path.join(temp_dir, "TechFiveLabels_new.exe")
+        setup_path = os.path.join(temp_dir, "TechFiveLabels_Setup.exe")
         
-        print("Téléchargement de la mise à jour...")
+        status_label.text = "Connexion au serveur GitHub..."
         response = requests.get(download_url, stream=True, timeout=30)
+        
         if response.status_code == 200:
-            with open(new_exe_path, 'wb') as f:
-                for chunk in response.iter_content(chunk_size=8192):
-                    f.write(chunk)
+            total_size = int(response.headers.get('content-length', 0))
+            downloaded_size = 0
             
-            # 2. Récupérer le chemin de l'exe actuel (uniquement si compilé avec PyInstaller)
-            if getattr(sys, 'frozen', False):
-                current_exe_path = sys.executable
-            else:
-                print("Mode développement : impossible de remplacer l'exe source automatiquement.")
-                return False
-
-            # 3. Créer un script batch temporaire pour faire la bascule
-            bat_path = os.path.join(temp_dir, "update.bat")
-            bat_content = f"""
-            @echo off
-            timeout /t 2 /nobreak > nul
-            move /y "{new_exe_path}" "{current_exe_path}"
-            start "" "{current_exe_path}"
-            del "%~f0"
-            """
-            with open(bat_path, 'w') as bat_file:
-                bat_file.write(bat_content)
-
-            # 4. Lancer le script batch en arrière-plan et fermer l'application
-            subprocess.Popen([bat_path], shell=True)
+            with open(setup_path, 'wb') as f:
+                for chunk in response.iter_content(chunk_size=8192):
+                    if chunk:
+                        f.write(chunk)
+                        downloaded_size += len(chunk)
+                        if total_size > 0:
+                            progress = downloaded_size / total_size
+                            progress_bar.value = progress
+                            status_label.text = f"Téléchargement : {int(progress * 100)}%"
+            
+            status_label.text = "Téléchargement terminé ! Lancement de l'installeur..."
+            
+            # Lancement de l'installeur SANS /VERYSILENT pour suivre l'installation visuellement
+            # (Inno Setup s'occupe de fermer l'app et de remplacer les fichiers proprement)
+            subprocess.Popen([setup_path])
+            
             os._exit(0)
+        else:
+            status_label.text = f"Erreur HTTP {response.status_code} : Fichier introuvable."
+            return False
             
     except Exception as e:
-        print(f"Erreur lors de la mise à jour automatique : {e}")
+        status_label.text = f"Erreur : {str(e)}"
         return False
     return True
 
@@ -107,21 +104,22 @@ def splash_page():
     ui.add_head_html(f'<link rel="shortcut icon" href="/data/favicon.ico" type="image/x-icon">')
     
     with ui.column().classes('w-full h-screen items-center justify-center bg-slate-900 text-white gap-6'):
-        # On pointe directement vers le fichier physique via le chemin absolu sécurisé
         splash_img_path = resource_path('data/Splashscreen.jpg')
         ui.image(splash_img_path).classes('w-[700px] max-w-[90vw] rounded-lg shadow-2xl border border-slate-700')
 
         spinner = ui.spinner(size='lg', color='primary').classes('mt-2')
         status_label = ui.label('Initialisation de l\'environnement et vérification...').classes('text-xs text-slate-400 italic')
+        
+        # Barre de progression intégrée (masquée par défaut)
+        progress_bar = ui.linear_progress(value=0.0).classes('w-96 mb-2')
+        progress_bar.set_visibility(False)
 
-        # Conteneur pour afficher un bouton de mise à jour si nécessaire (caché par défaut)
         update_container = ui.column().classes('items-center gap-2')
         update_container.set_visibility(False)
 
         async def check_update_and_redirect():
             await ui.context.client.connected()
             
-            # Étape 1 : Vérification de la mise à jour via l'API GitHub
             status_label.text = "Vérification des mises à jour logicielles..."
             update_available = False
             download_url = ""
@@ -140,7 +138,6 @@ def splash_page():
             except Exception as e:
                 print(f"Mode hors-ligne ou erreur de vérification : {e}")
 
-            # Étape 2 : Action selon le résultat
             if update_available:
                 spinner.set_visibility(False)
                 status_label.text = f"Une nouvelle version est disponible !"
@@ -149,13 +146,13 @@ def splash_page():
                     ui.label("Mise à jour requise pour continuer.").classes('text-xs text-amber-400')
                     ui.button('Installer et redémarrer', 
                               on_click=lambda: [
-                                  status_label.set_text("Téléchargement de la mise à jour en cours..."),
-                                  perform_auto_update(download_url)
+                                  progress_bar.set_visibility(True),
+                                  spinner.set_visibility(False),
+                                  perform_auto_update(download_url, progress_bar, status_label)
                               ]
                     ).classes('bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-2 px-4 rounded')
                 update_container.set_visibility(True)
             else:
-                # Pas de maj, on lance l'application normalement
                 status_label.text = "Prêt ! Ouverture de l'espace de travail..."
                 await asyncio.sleep(1.5)
                 ui.run_javascript('window.location.href = "/app"')
@@ -181,7 +178,6 @@ def main_app_page():
         with ui.tab_panel(tab_print):
             create_print_tab()
 
-# Fonction pour maximiser la fenêtre au démarrage natif
 def maximize_native_window():
     try:
         if webview.windows:
@@ -191,11 +187,10 @@ def maximize_native_window():
 
 app.on_startup(maximize_native_window)
 
-# Lancement de l'application en mode natif
 ui.run(
     port=8080, 
     title="TechFive Labels", 
-    favicon='data/favicon.ico',
+    favicon=resource_path('data/favicon.ico'),
     native=True,         
     window_size=(1280, 800), 
     reload=True, 
