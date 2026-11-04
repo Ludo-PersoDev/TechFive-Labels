@@ -19,7 +19,7 @@ DB_PATH = os.path.join(DB_DIR, "etiquettes.db")
 # ---------------------------------------------------------------------
 
 def init_db():
-    os.makedirs("data", exist_ok=True)
+    os.makedirs(DB_DIR, exist_ok=True)
     conn = sqlite3.connect(DB_PATH)
     cursor = conn.cursor()
     
