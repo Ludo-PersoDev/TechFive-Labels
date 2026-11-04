@@ -1,6 +1,15 @@
 import sys
 import os
 
+def resource_path(relative_path):
+    """ Obtient le chemin absolu vers les ressources, compatible dev et PyInstaller """
+    try:
+        # PyInstaller crée un dossier temporaire et stocke le chemin dans _MEIPASS
+        base_path = sys._MEIPASS
+    except Exception:
+        base_path = os.path.abspath(".")
+    return os.path.join(base_path, relative_path)
+
 # --- SÉCURISATION DU DOSSIER DATA (DANS APPDATA POUR ÉVITER LES PERMISSIONS) ---
 if getattr(sys, 'frozen', False):
     # En mode exécutable (Program Files), on stocke les données dans AppData\Roaming\TechFiveLabels\data
@@ -95,10 +104,12 @@ def perform_auto_update(download_url):
 
 @ui.page('/')
 def splash_page():
-    ui.add_head_html('<link rel="shortcut icon" href="/data/favicon.ico" type="image/x-icon">')
+    ui.add_head_html(f'<link rel="shortcut icon" href="/data/favicon.ico" type="image/x-icon">')
     
     with ui.column().classes('w-full h-screen items-center justify-center bg-slate-900 text-white gap-6'):
-        ui.image('/data/Splashscreen.jpg').classes('w-[700px] max-w-[90vw] rounded-lg shadow-2xl border border-slate-700')
+        # On pointe directement vers le fichier physique via le chemin absolu sécurisé
+        splash_img_path = resource_path('data/Splashscreen.jpg')
+        ui.image(splash_img_path).classes('w-[700px] max-w-[90vw] rounded-lg shadow-2xl border border-slate-700')
 
         spinner = ui.spinner(size='lg', color='primary').classes('mt-2')
         status_label = ui.label('Initialisation de l\'environnement et vérification...').classes('text-xs text-slate-400 italic')
